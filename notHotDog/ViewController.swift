@@ -12,6 +12,8 @@ import Vision
 
 class ViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
     @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var resultLabel: UILabel!
+
     let imagePicker = UIImagePickerController()
 
     override func viewDidLoad() {
@@ -30,6 +32,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             guard let coreImage = CIImage(image: userPickedImage) else {
                 fatalError("could not convert picked image into CIImage")
             }
+            detectImgae(image: coreImage)
         }
         imagePicker.dismiss(animated: true, completion: nil)
     }
@@ -38,6 +41,28 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     func detectImgae(image: CIImage) {
         guard let model = try? VNCoreMLModel(for: Inceptionv3().model) else {
             fatalError("training model failed to load")
+        }
+
+        let request = VNCoreMLRequest(model: model) { (request, error) in
+            guard let results = request.results as? [VNClassificationObservation] else {
+                fatalError("model failed to process image")
+            }
+
+            if let firstResult = results.first {
+                if firstResult.identifier.contains("hotdog") {
+                    self.resultLabel.text = "hotdog"
+                } else {
+                    self.resultLabel.text = "not hotdog"
+                }
+            }
+
+        }
+
+        let handler = VNImageRequestHandler(ciImage: image)
+        do {
+            try handler.perform([request])
+        } catch {
+            print(error)
         }
 
     }
