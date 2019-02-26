@@ -55,7 +55,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
                     self.resultLabel.text = "not hotdog"
                 }
             }
-
         }
 
         let handler = VNImageRequestHandler(ciImage: image)
@@ -64,7 +63,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         } catch {
             print(error)
         }
-
     }
 
     @objc func didPressCamera() {
